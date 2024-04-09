@@ -25,7 +25,11 @@ const userModel=mongoose.model("userModel",userSchema);
 app.post('/api/users',async(request,response)=>{
 const username= request.body.username;
 const responsePayload=await userModel.create({userName:username});
-response.json({username:username,id:responsePayload._id});
+response.json({username:username,_id:responsePayload._id});
+})
+app.get('/api/users',async(request,response)=>{
+  const responsePayload=await userModel.find({});
+  response.json(responsePayload);
 })
 
 
