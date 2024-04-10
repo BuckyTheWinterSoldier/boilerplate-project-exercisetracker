@@ -31,8 +31,54 @@ app.get('/api/users',async(request,response)=>{
   const responsePayload=await userModel.find({});
   response.json(responsePayload);
 })
+const exerciseSchema=mongoose.Schema({
+  _userId:{
+    type:String,required:true
+  },
+  description:{
+    type:String,required:true
+  },
+  duration:{
+    type:String,required:true
+  },
+  date:{
+    type:String,required:true
+  }
+});
+const exerciseModel=mongoose.model("exerciseModel",exerciseSchema);
+app.post("/api/users/:_id/exercises",async(request,response)=>{
+  const description=request.body.description;
+  const {_id}=request.params;
+  const duration=request.body.duration;
+  let date=request.body.date;
+  if(!date){
+    date=new Date().toISOString().substring(0, 10);
+  }
+  const requestPayload={
+    _userId:_id,
+    description:description,
+    duration:duration,
+    date:date
 
+  }
+  const responsePayload=await exerciseModel.create(requestPayload);
+  const userresponsePayload=await userModel.findById(_id);
 
+  // console.log(responsePayload);
+  // console.log(userresponsePayload);
+  
+let formattedDate = new Date(date);
+formattedDate = formattedDate.toString().split(' ');
+let finalDate=`${formattedDate[0]} ${formattedDate[1]} ${formattedDate[2]} ${formattedDate[3]}`;
+  response.json({
+    username: userresponsePayload.userName,
+    description: description,
+    duration: duration,
+    date: finalDate,
+    _id: _id
+  });
+
+})
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
