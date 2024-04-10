@@ -29,7 +29,11 @@ response.json({username:username,_id:responsePayload._id});
 })
 app.get('/api/users',async(request,response)=>{
   const responsePayload=await userModel.find({});
-  response.json(responsePayload);
+  let finalArray=[];
+  responsePayload.forEach((record)=>{
+    finalArray.push({username:record.userName,_id:record._id});
+  })
+  response.json(finalArray);
 })
 const exerciseSchema=mongoose.Schema({
   _userId:{
@@ -39,7 +43,7 @@ const exerciseSchema=mongoose.Schema({
     type:String,required:true
   },
   duration:{
-    type:String,required:true
+    type:Number,required:true
   },
   date:{
     type:String,required:true
@@ -49,7 +53,7 @@ const exerciseModel=mongoose.model("exerciseModel",exerciseSchema);
 app.post("/api/users/:_id/exercises",async(request,response)=>{
   const description=request.body.description;
   const {_id}=request.params;
-  const duration=request.body.duration;
+  const duration=parseInt(request.body.duration);
   let date=request.body.date;
   if(!date){
     date=new Date().toISOString().substring(0, 10);
