@@ -64,16 +64,17 @@ app.post("/api/users/:_id/exercises", async (request, response) => {
     description: description,
     duration: duration,
     date: date
-
   }
+  // console.log(requestPayload);
   const responsePayload = await exerciseModel.create(requestPayload);
   const userresponsePayload = await userModel.findById(_id);
   // console.log(responsePayload);
   // console.log(userresponsePayload);
-  let formattedDate = new Date(date);
+  // let formattedDate = new Date(date);
+  let formattedDate=responsePayload.date;
   formattedDate = formattedDate.toString().split(' ');
   let finalDate = `${formattedDate[0]} ${formattedDate[1]} ${formattedDate[2]} ${formattedDate[3]}`;
-  response.json({
+   response.json({
     username: userresponsePayload.userName,
     description: description,
     duration: duration,
@@ -86,7 +87,7 @@ app.post("/api/users/:_id/exercises", async (request, response) => {
 app.get("/api/users/:_id/logs", async (request, response) => {
   const { _id } = request.params;
   const { from, to, limit } = request.query;
-  console.log(`${_id} ${from} ${limit} ${limit}`);
+  // console.log(`${_id} ${from} ${limit} ${limit}`);
   let exerciseResponsePayload;
   if (from || to) {
     let query = {};
@@ -102,22 +103,20 @@ app.get("/api/users/:_id/logs", async (request, response) => {
       logsQuery = logsQuery.limit(parseInt(limit));
     }
     exerciseResponsePayload = await logsQuery.exec();
-  }
+  } 
   else {
     exerciseResponsePayload = await exerciseModel.findOne({ _userId: _id });
   }
   const userResponsePayload = await userModel.findById(_id);
-  console.log(exerciseResponsePayload);
+  // console.log(exerciseResponsePayload);
   //   console.log(userResponsePayload);
   let exerciseLog = [];
-  if(exerciseResponsePayload.length===1){
-  exerciseResponsePayload = [exerciseResponsePayload];
-  }
+  exerciseResponsePayload = Array.isArray(exerciseResponsePayload) ? exerciseResponsePayload : [exerciseResponsePayload]; 
   exerciseResponsePayload.forEach((record) => {
     let formattedDate = record.date;
-    formattedDate = formattedDate.toString().split('T');
-    let finalDate = `${formattedDate[0]}`;
-
+    // console.log(formattedDate);
+    formattedDate = formattedDate.toString().split(' ');
+  let finalDate = `${formattedDate[0]} ${formattedDate[1]} ${formattedDate[2]} ${formattedDate[3]}`;
     exerciseLog.push({
       description: record.description,
       duration: record.duration,
